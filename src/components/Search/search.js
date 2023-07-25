@@ -15,7 +15,7 @@ export const Search = () => {
   return (
     <SearhField>
       <SearchName>
-        "Find contacts by name"
+        Find contacts by name
         <SearchInput value={filter} onChange={changeFilter}></SearchInput>
       </SearchName>
     </SearhField>

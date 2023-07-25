@@ -22,8 +22,6 @@ import {
   LabelSpan,
 } from "./addform.styled";
 
-console.log();
-
 const schema = yup.object().shape({
   name: yup
     .string()
@@ -35,10 +33,9 @@ const schema = yup.object().shape({
     .required(),
   number: yup
     .string()
-    .phone(
-      "UA",
-      true,
-      "Phone number must be a valid phone number for region UA, digits and can contain spaces, dashes, parentheses and can start with +"
+    .matches(
+      /^\+38-\d{3}-\d{3}-\d{2}-\d{2}$/,
+      "Phone number is not valid. Please use format +38-XXX-XXX-XX-XX"
     )
     .required(),
 });
