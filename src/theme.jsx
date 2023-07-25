@@ -38,4 +38,8 @@ export const theme = {
     medium: '8px',
     round: '50%',
   },
+    shadows: {
+    textShadow: '0 0.4px 0.4px #fff',
+    boxShadow: '#8E9AAF 8px 8px 5px 0px',
+  },
 };

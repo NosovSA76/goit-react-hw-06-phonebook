@@ -1,20 +1,23 @@
 import React from "react";
-import PropTypes from "prop-types";
+import { useDispatch, useSelector } from "react-redux";
+import { setFilter } from "../../redux/filter/filter-slice";
+import { getFilter } from "../../redux/filter/filter-selector";
 import { SearchName, SearchInput, SearhField } from "./search.styled";
 
-export const Search = ({ text, valueSearch, onChange }) => {
+export const Search = () => {
+  const filter = useSelector(getFilter);
+  const dispatch = useDispatch();
+
+  const changeFilter = (e) => {
+    dispatch(setFilter(e.target.value.toLowerCase().trim()));
+  };
+
   return (
     <SearhField>
       <SearchName>
-        {text}
-        <SearchInput value={valueSearch} onChange={onChange}></SearchInput>
+        "Find contacts by name"
+        <SearchInput value={filter} onChange={changeFilter}></SearchInput>
       </SearchName>
     </SearhField>
   );
-};
-
-Search.propTypes = {
-  text: PropTypes.string.isRequired,
-  valueSearch: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
 };

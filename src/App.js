@@ -1,4 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { deleteContact } from "./redux/contacts/contacts-slice";
 import { WrapperPhonebook } from "./components/Phonebookwrapper/phonebookwrapper";
 import { Title } from "./components/Title/title";
 import { InputForm } from "./components/Addform/addform";
@@ -9,58 +13,37 @@ import { ShowButton } from "./components/ShowButton/showButton";
 import { CountMessage } from "./components/CountMessage/CountMessage";
 import { WarningText } from "./App.styled";
 import { getCountMessage } from "./utils/getCountMessage";
-import { save, load } from "./utils/localStorageJSON";
+import { getContacts } from "./redux/contacts/contacts-selectors";
+import { setFilter } from "./redux/filter/filter-slice";
 
 export const App = () => {
-  const [contacts, setContacts] = useState(load("contacts") ?? []);
   const [searchText, setSearchText] = useState("");
   const [isSecondButtonVisible, setIsSecondButtonVisible] = useState(true);
-  const [filterContacts, setFilterContacts] = useState(contacts);
-
-  useEffect(() => {
-    save("contacts", contacts);
-  }, [contacts]);
-
-  useEffect(() => {
-    setFilterContacts(
-      contacts.filter((contact) =>
-        contact.name.toLowerCase().includes(searchText.toLowerCase())
-      )
-    );
-  }, [searchText, contacts]);
+  const contacts = useSelector(getContacts);
 
   const changeFilter = (e) => {
     setSearchText(e.currentTarget.value);
   };
 
-  const handleDeleteContact = (contactID) => {
-    setContacts(contacts.filter((contact) => contact.id !== contactID));
-    setIsSecondButtonVisible(contacts.length === 1);
-    if (filterContacts.length === 1) {
-      setFilterContacts(contacts);
-      setSearchText("");
-    }
-  };
-
-  const handleWriteContact = (newContact) => {
-    setContacts((prevContacts) => [...prevContacts, newContact]);
-  };
-
   const handleToggleSecondButtonVisibility = () => {
     setIsSecondButtonVisible((prevVisibility) => !prevVisibility);
-    setFilterContacts(contacts);
+    dispatch(setFilter(""));
+    setSearchText("");
+  };
+
+  const dispatch = useDispatch();
+
+  const handleDeleteContact = (contactId) => {
+    setIsSecondButtonVisible(contacts.length === 1);
+    dispatch(setFilter(""));
+    setSearchText("");
+    dispatch(deleteContact(contactId));
   };
 
   return (
     <WrapperPhonebook>
       <Title text="PhoneBook" />
-      {isSecondButtonVisible && (
-        <InputForm
-          onSubmit={handleWriteContact}
-          contacts={contacts}
-          onUpdateContact={setContacts}
-        />
-      )}
+      {isSecondButtonVisible && <InputForm />}
       {isSecondButtonVisible && (
         <CountMessage text={getCountMessage(contacts.length)} />
       )}
@@ -73,21 +56,18 @@ export const App = () => {
       {!isSecondButtonVisible && (
         <>
           <ContactsTitle text="Contacts" />
-          <Search
-            valueSearch={searchText}
-            onChange={changeFilter}
-            text={"Find contacts by name"}
-          />
-          {filterContacts.length === 0 ? (
+          <Search valueSearch={searchText} onChange={changeFilter} />
+          {contacts.length === 0 ? (
             <WarningText>Nothing was found for your request</WarningText>
           ) : (
             <ContactList
-              contacts={filterContacts}
+              contacts={contacts}
               onDeleteContact={handleDeleteContact}
             />
           )}
         </>
       )}
+      <ToastContainer />
     </WrapperPhonebook>
   );
 };
